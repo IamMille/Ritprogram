@@ -7,14 +7,27 @@
     <script src="myShapes.js"></script>
     <script src="myApp.js"></script>
   </head>
-  <body>
+  <body onload="run()">
 
     <main>
       <nav>
-        floating nav bar
+        <button>New</button>
+        <button>Triangle</button>
+        <button>Rectangle</button>
+        <button>Circle</button>
+        <button>Polygon</button>
+        <button>(Import)</button>
+        <button>(Export)</button>
+        <input type="color" name="userColor" value="#000000" />
       </nav>
 
-      <canvas></canvas>
+      <aside>
+        Running...
+      </aside>
+
+      <canvas>
+        Canvas
+      </canvas>
     </main>
 
   </body>
