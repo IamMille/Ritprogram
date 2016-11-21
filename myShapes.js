@@ -8,6 +8,7 @@
 
 // ###############################  COMMON ###############################
 
+
 function Figure() {} //http://tobyho.com/2010/11/22/javascript-constructors-and/
 Circle.prototype    = Object.create(Figure.prototype); // inheritance
 Rectangle.prototype = Object.create(Figure.prototype); // inheritance
@@ -46,7 +47,7 @@ Figure.prototype.figureType = function()
 Figure.prototype.distanceTo = function(otherFigure)
 {
  	var PointsFigureA = this.points(),
- 		   PointsFigureB = otherFigure.points();
+ 		  PointsFigureB = otherFigure.points();
 
  	var smallestDistance = Infinity;
 
@@ -97,10 +98,15 @@ Figure.prototype.height = function ()
 
 // ###############################  CIRCLE ###############################
 
-function Circle(x, y, radius)
+function Circle(args) //(x, y, radius)
 {
-	this.cords  = [x, y];
-	this.radius = radius;
+	//this.cords  = [x, y];
+	//this.radius = radius;
+	this.cords = [ args[0], args[1] ];
+	this.radius = this.distancePoints(
+		{x: args[0], y: args[1]},
+		{x: args[2], y: args[3]}
+	);
 }
 
 Circle.prototype.boundingBox = function()
@@ -112,13 +118,31 @@ Circle.prototype.boundingBox = function()
 
 Circle.prototype.area = function () { return this.radius * this.radius * Math.PI; };
 
+Circle.prototype.draw = function() {
+	var canvas = document.getElementsByTagName("canvas")[0];
+	var ctx = canvas.getContext("2d");
+	ctx.beginPath();
+	ctx.arc( this.cords[0],this.cords[1],
+					 this.radius, 0, Math.PI*2 );
+	ctx.stroke();
+};
 
 // ##############################  RECTANGLE ##############################
 
-function Rectangle(x1,y1, x3,y3)
+function Rectangle(args) //(x1,y1, x3,y3)
 {
-	this.cords = [x1,y1, x1,y3, x3,y3, x3,y1];
+	if (args.length > 4) throw new Error("To many arguments");
+	this.cords = args;
 }
+Rectangle.prototype.draw = function()
+{
+	var canvas = document.getElementsByTagName("canvas")[0];
+	var ctx = canvas.getContext("2d");
+	var myRect = [ this.cords[0], this.cords[1],
+								 this.width() , this.height() ];
+	ctx.rect.apply(ctx, myRect);
+	ctx.stroke();
+};
 
 Rectangle.prototype.center = function()
 {
@@ -137,9 +161,10 @@ Rectangle.prototype.distanceTo = function(otherFigure)
 
 // ##############################  TRIANGLE ##############################
 
-function Triangle(x1,y1, x2,y2, x3,y3)
+function Triangle(args)
 {
-	this.cords  = [x1,y1, x2,y2, x3,y3];
+	//this.cords  = [x1,y1, x2,y2, x3,y3];
+	this.cords  = args;
 }
 
 Triangle.prototype.area = function()
@@ -171,9 +196,9 @@ Triangle.prototype.boundingBox = function()
 
 // ##############################  POLYGON ##############################
 
-function Polygon(...args) //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
+function Polygon(args) //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
 {
-	if (args.length < 6)
+	if (args.length <= 6)
 		throw new Error("At least three cordinates needed for Polygon.");
 
 	if (args.length%2 !== 0)
@@ -181,6 +206,21 @@ function Polygon(...args) //https://developer.mozilla.org/en-US/docs/Web/JavaScr
 
 	this.cords = args;
 }
+
+Polygon.prototype.draw = function()
+{
+	var canvas = document.getElementsByTagName("canvas")[0];
+	var ctx = canvas.getContext('2d');
+
+	ctx.beginPath();
+	ctx.lineWidth = "2";
+	ctx.moveTo( this.cords[0], this.cords[1]);
+	for (var i = 2; i<this.cords.length; i+=2)
+		ctx.lineTo(this.cords[i],
+							this.cords[i+1]);
+	ctx.closePath();
+	ctx.stroke();
+};
 
 Polygon.prototype.area = function() //http://www.mathopenref.com/coordpolygonarea.html
 {
@@ -210,3 +250,8 @@ Polygon.prototype.boundingBox = function()
 	return new Rectangle( minX, minY,
 						            minX + this.width(), minY + this.height() );
 };
+
+// needs to be after all declarations
+Triangle.prototype.draw = Polygon.prototype.draw;
+
+//}); // end onload
