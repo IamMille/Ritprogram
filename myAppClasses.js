@@ -1,7 +1,7 @@
 
 class Status {
   constructor() {
-    this.status = $("aside");
+    this.status = $("footer span");
     this.save = false;
     this.old = null;
   }
@@ -47,8 +47,7 @@ class Canvas {
     $("dialog p").innerText = "Import from JSON:";
     $("dialog button").innerText = "IMPORT";
     $("dialog textarea").focus();
-    //DEBUG
-    $("dialog textarea").value = '[{"figure":"Triangle","cords":[144,187,107,245,172,248]},{"figure":"Triangle","color":"red","cords":[111,198,172,206,141,266]},{"figure":"Polygon","color":"green","cords":[241,300,214,356,191,305,261,341,185,324,242,297,242,297]}]';
+    //DEBUG $("dialog textarea").value = '[{"figure":"Triangle","cords":[144,187,107,245,172,248]},{"figure":"Triangle","color":"red","cords":[111,198,172,206,141,266]},{"figure":"Polygon","color":"green","cords":[241,300,214,356,191,305,261,341,185,324,242,297,242,297]}]';
   }
   closeImport() {
       var json = $("dialog textarea").value;
@@ -81,6 +80,10 @@ class Canvas {
     var randomColor = [ "#7F00FF","#00FFFF","#FF00FF","#0000FF",
                         "#FFFF00","#FF0000","#00FF00","#FF7F00"];
     $("input[type='color']").value = randomColor[this.drawings.length] || "#000";
+  }
+  toggleMenu() {
+    var isOpen = $("menu").classList.contains('slide-in');
+    $("menu").setAttribute('class', isOpen ? 'slide-out' : 'slide-in');
   }
 }
 

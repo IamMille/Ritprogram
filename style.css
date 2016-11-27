@@ -43,14 +43,26 @@ menu input {
   height: 20px;
   width: 49px;
 }
-aside {
+footer {
   position: absolute;
   bottom: 0px;
   width: 100%;
   padding: 5px;
   border-top: 1px solid rgb(108, 105, 105);
-  z-index: 1;
+  display: flex;
+  align-items: center;
 }
+footer span:first-child {
+  flex: 1 1 auto;
+  width: 100%;
+}
+footer span:last-child {
+  flex: 1 1 50px;
+  margin-left: 5px;
+  margin-right: 10px;
+  font-size: 0.80em;
+}
+
 dialog {
   top: 35%;
   width: 310px;

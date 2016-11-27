@@ -42,6 +42,7 @@ $$("button, input[type='color']").forEach(btn =>  // buttons AND colorpicker
       Polygon: "Use to draw a Polygon",
       Import: "Import figures from JSON",
       Export: "Export figures to JSON",
+      Menu: "Click to toggle menu",
       IMPORT: "Click to import figures", // button in dialog
       CLOSE: "Click to close dialog" // button in dialog
     };
@@ -63,10 +64,7 @@ $$("button, input[type='color']").forEach(btn =>  // buttons AND colorpicker
     else if (btnName == "CLOSE") $canvas.closeExport(); // Export dialog
     else if (btnName == "IMPORT") $canvas.closeImport();
     else if (btnName == "New") $canvas.clear();
-    else if (btnName == "Menu") {
-      var isOpen = $("menu").classList.contains('slide-in');
-      $("menu").setAttribute('class', isOpen ? 'slide-out' : 'slide-in');
-    }
+    else if (btnName == "Menu") $canvas.toggleMenu();
     else {
       $mouse.startDrawing(btnName);
       $mouse.addClickCords(); // empty, to just update status
@@ -112,11 +110,12 @@ $("canvas").addEventListener("click", event =>
 document.addEventListener("keyup", event =>
 {
   if (event.keyCode == 27) // escape
+    $("dialog").style.display = "none"; // close import/export if open
     if ($mouse.isDrawing())
-        $mouse.endDrawing();
+          $mouse.endDrawing();
 });
 
 /////////////////////////////////////////////////////////////
-setTimeout( () => { $status.remove(); }, 1000); // not triggered if errors :-)
+setTimeout( () => { $status.remove(); }, 900); // not triggered if errors :-)
 /////////////////////////////////////////////////////////////
 }; // end onLoad
