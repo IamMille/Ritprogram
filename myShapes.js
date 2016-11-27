@@ -8,7 +8,6 @@
 
 // ###############################  COMMON ###############################
 
-
 function Figure() {} //http://tobyho.com/2010/11/22/javascript-constructors-and/
 Circle.prototype    = Object.create(Figure.prototype); // inheritance
 Rectangle.prototype = Object.create(Figure.prototype); // inheritance
@@ -78,7 +77,7 @@ Figure.prototype.distancePoints = function(one, two)
 	var dx = one.x - two.x,
   		dy = one.y - two.y;
 
-	return Math.sqrt( dx*dx + dy*dy );
+	return Math.sqrt( dx*dx + dy*dy ).toFixed(0);
 };
 
 Figure.prototype.width = function ()
@@ -98,10 +97,12 @@ Figure.prototype.height = function ()
 
 // ###############################  CIRCLE ###############################
 
-function Circle(args) //(x, y, radius)
+function Circle(args, color) //(x, y, radius)
 {
 	//this.cords  = [x, y];
 	//this.radius = radius;
+	this.figure = "Circle";
+	this.color = color || "#000";
 	this.cords = [ args[0], args[1] ];
 	this.radius = this.distancePoints(
 		{x: args[0], y: args[1]},
@@ -118,30 +119,40 @@ Circle.prototype.boundingBox = function()
 
 Circle.prototype.area = function () { return this.radius * this.radius * Math.PI; };
 
-Circle.prototype.draw = function() {
-	var canvas = document.getElementsByTagName("canvas")[0];
-	var ctx = canvas.getContext("2d");
+Circle.prototype.draw = function($canvas)
+{
+	//var canvas = document.getElementsByTagName("canvas")[0];
+	var ctx = $canvas.ctx;
 	ctx.beginPath();
+	ctx.strokeStyle = this.color;
 	ctx.arc( this.cords[0],this.cords[1],
 					 this.radius, 0, Math.PI*2 );
 	ctx.stroke();
+	$canvas.addDrawing(this);
+	console.log($canvas.getDrawings());
 };
 
 // ##############################  RECTANGLE ##############################
 
-function Rectangle(args) //(x1,y1, x3,y3)
+function Rectangle(args, color) //(x1,y1, x3,y3)
 {
 	if (args.length > 4) throw new Error("To many arguments");
+	this.figure = "Rectangle";
+	this.color = color;
 	this.cords = args;
 }
-Rectangle.prototype.draw = function()
+Rectangle.prototype.draw = function($canvas)
 {
-	var canvas = document.getElementsByTagName("canvas")[0];
-	var ctx = canvas.getContext("2d");
+	//var canvas = document.getElementsByTagName("canvas")[0];
+	var ctx = $canvas.ctx;
 	var myRect = [ this.cords[0], this.cords[1],
 								 this.width() , this.height() ];
+
+  ctx.beginPath();
 	ctx.rect.apply(ctx, myRect);
+	ctx.strokeStyle = this.color;
 	ctx.stroke();
+	$canvas.addDrawing(this);
 };
 
 Rectangle.prototype.center = function()
@@ -161,9 +172,11 @@ Rectangle.prototype.distanceTo = function(otherFigure)
 
 // ##############################  TRIANGLE ##############################
 
-function Triangle(args)
+function Triangle(args, color)
 {
 	//this.cords  = [x1,y1, x2,y2, x3,y3];
+	this.figure = "Triangle";
+	this.color = color || "#000";
 	this.cords  = args;
 }
 
@@ -193,33 +206,34 @@ Triangle.prototype.boundingBox = function()
 						            x + this.width(), y + this.height() );
 };
 
-
 // ##############################  POLYGON ##############################
 
-function Polygon(args) //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
+function Polygon(args, color) //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
 {
-	if (args.length <= 6)
-		throw new Error("At least three cordinates needed for Polygon.");
-
+	//if (args.length <= 6)
+		//throw new Error("At least three cordinates needed for Polygon.");
 	if (args.length%2 !== 0)
 		throw new Error("Number of X and Y cordinates needs to match.");
 
+	this.figure = "Polygon";
+	this.color = color;
 	this.cords = args;
 }
 
-Polygon.prototype.draw = function()
+Polygon.prototype.draw = function($canvas)
 {
-	var canvas = document.getElementsByTagName("canvas")[0];
-	var ctx = canvas.getContext('2d');
-
+	//var canvas = document.getElementsByTagName("canvas")[0];
+	var ctx = $canvas.ctx;
 	ctx.beginPath();
+	ctx.strokeStyle = this.color || "";
 	ctx.lineWidth = "2";
 	ctx.moveTo( this.cords[0], this.cords[1]);
-	for (var i = 2; i<this.cords.length; i+=2)
+	for (let i = 2; i<this.cords.length; i+=2)
 		ctx.lineTo(this.cords[i],
 							this.cords[i+1]);
 	ctx.closePath();
 	ctx.stroke();
+	$canvas.addDrawing(this);
 };
 
 Polygon.prototype.area = function() //http://www.mathopenref.com/coordpolygonarea.html
@@ -254,4 +268,4 @@ Polygon.prototype.boundingBox = function()
 // needs to be after all declarations
 Triangle.prototype.draw = Polygon.prototype.draw;
 
-//}); // end onload
+// }); // end onload

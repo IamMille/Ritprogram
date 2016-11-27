@@ -1,183 +1,122 @@
-
-window.onload = function() {
-////////////////////////////
 NodeList.prototype.forEach = Array.prototype.forEach;
+NodeList.prototype.push = Array.prototype.push;
 HTMLCollection.prototype.forEach = Array.prototype.forEach;
-////////////////////////////
+
+function $(str)  { return document.querySelector(str);    }
+function $$(str) { return document.querySelectorAll(str); }
+
+var $status, $mouse, $canvas; // so we can access these from myAppClasses.js
 
 
-class Canvas {
-  constructor() {
-    this.elm = document.getElementsByTagName("canvas")[0];
-    this.ctx = this.elm.getContext("2d");
-  }
-  clear() {
-    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this.ctx.clearRect(0, 0, this.elm.width, this.elm.height);
-    status.set("Canvas cleared.");
-  }
+/////////////////////////////////////////////////////////////
+window.onload = function() {
+/////////////////////////////////////////////////////////////
 
-}
-class Status {
-  constructor() {
-    this.status = document.getElementsByTagName("aside")[0];
-    this.save = false;
-    this.old = null;
-  }
-  set(msg, save) {
-    if (save) this.old = this.status.innerText;
-    if (msg) this.status.innerText = msg;
-    else console.trace("Status called with undefined"); // dont use in production
-  }
-  restore() {
-    if (this.old) this.set(this.old);
-    this.save = false;
-  }
-  remove() {
-    this.status.innerText = "This is the default statusbar text";
-  }
-}
+$status = new Status();
+$mouse  = new Mouse();
+$canvas = new Canvas();
 
-class Mouse {
-  constructor() {
-    this._isDrawing = false;
-    this._isDrawingNumCords = null;
-    this._cords = [];
-  }
-  startDrawing(figure) {
-    canvas.style.cursor = "crosshair";
-    var figureNumCords = {
-      Rectangle: 2, Triangle: 3, Circle: 2, Polygon: Infinity
-    };
-    this._isDrawingNumCords = figureNumCords[figure];
-    this._isDrawing = figure;
-  }
-  isDrawing() {
-    return this._isDrawing;
-  }
-  addClickCords(x, y) {
-    this._cords.push(x, y);
-
-    if (this._isDrawing == "Polygon")
-      status.set( $mouse._isDrawing + ": click to add points, dubbelclick to end." );
-    else
-      status.set( $mouse._isDrawing + ": click " +
-        this.numCordsLeft() + " point(s) on the canvas..." );
-  }
-  getClickCords() {
-    return this._cords;
-  }
-  isAllCords() {
-    return (this._isDrawingNumCords == this._cords.length/2);
-  }
-  numCordsLeft() {
-    return (this._isDrawingNumCords - this._cords.length/2);
-  }
-  endDrawing() {
-    canvas.style.cursor = "default";
-    status.remove(this._isDrawing + " complete.");
-    //if (this._isDrawing == "Polygon") this._cords.splice(-2,2);
-    this._isDrawing = null;
-    this._isDrawingNumCords = null;
-    this._cords = [];
-    $mouse = new Mouse();
-  }
-}
-
-
-var status  = new Status();
-var $mouse  = new Mouse();
-var $canvas = new Canvas();
-
-//var main = document.getElementsByTagName("main")[0];
-var nav = document.getElementsByTagName("nav")[0];
-var buttons = nav.getElementsByTagName('button');
-var canvas = document.getElementsByTagName("canvas")[0];
-
-// Full screen canvas
+// Fullscreen canvas
 window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight-15; }, false
-);
+  $("canvas").width = window.innerWidth;
+  $("canvas").height = window.innerHeight;
+});
 window.dispatchEvent(new Event("resize")); // trigger resize
 
+
 // Events BUTTONS
-buttons.forEach(btn =>
+$$("button, input[type='color']").forEach(btn =>  // buttons AND colorpicker
 {
+
   btn.addEventListener("mouseover", event =>
   {
     if ($mouse.isDrawing()) return;
-    var btnName = btn.innerText;
+
+    var btnName = btn.innerText || btn.tagName; // tagName to get colorpicker
     var btnDescription = {
+      INPUT: "Click to choose drawing color", // colorpicker
       New: "Removes everything from the canvas",
-      Triangle: "Use to draw a tringle", // TODO: all the other buttons
-      Rectangle: "Use to draw a rectangle"
+      Triangle: "Use to draw a tringle",
+      Rectangle: "Use to draw a rectangle",
+      Circle: "Use to draw a circle",
+      Polygon: "Use to draw a Polygon",
+      Import: "Import figures from JSON",
+      Export: "Export figures to JSON",
+      IMPORT: "Click to import figures", // button in dialog
+      CLOSE: "Click to close dialog" // button in dialog
     };
-    status.set( btnDescription[btnName] || btnName, true);
+
+    $status.set(btnDescription[btnName], true);
   });
+
 
   btn.addEventListener("mouseleave", event => {
-    if (!$mouse.isDrawing) status.restore();
+    if (!$mouse.isDrawing()) $status.restore();
   });
 
 
-  btn.addEventListener("click", event => {
-
+  btn.addEventListener("click", event =>
+  {
     var btnName = btn.innerText;
-    if (btnName == "New") {
-       $canvas.clear();
-       return;
+    if (btnName == "Export") $canvas.openExport();
+    else if (btnName == "Import") $canvas.openImport();
+    else if (btnName == "CLOSE") $canvas.closeExport(); // Export dialog
+    else if (btnName == "IMPORT") $canvas.closeImport();
+    else if (btnName == "New") $canvas.clear();
+    else if (btnName == "Menu") {
+      var isOpen = $("menu").classList.contains('slide-in');
+      $("menu").setAttribute('class', isOpen ? 'slide-out' : 'slide-in');
     }
-
-    var btnAction = {
-      Triangle: "Triangle: click 3 point(s) on the canvas...",
-      Rectangle: "Rectangle: click 2 point(s) on the canvas...",
-      Circle: "Circle: click 2 point(s) on the canvas...",
-      Polygon: "Polygon: click on canvas to add points, end with a dubbelclick."
-    };
-
-    status.set( btnAction[btnName] || "click " + btnName);
-    $mouse.startDrawing(btnName);
+    else {
+      $mouse.startDrawing(btnName);
+      $mouse.addClickCords(); // empty, to just update status
+    }
   });
+
 }); // end forEach buttons
 
-
 // Events CANVAS
-canvas.addEventListener("dblclick", event => {
-   if ($mouse.isDrawing() == "Polygon") {
-     var cords = $mouse.getClickCords().slice(0,-2);
-     new Polygon(cords).draw();
-     $mouse.endDrawing();
-   }
+$("canvas").addEventListener("dblclick", event =>
+{
+   if ($mouse.isDrawing() != "Polygon") return;
+
+   var cords = $mouse.getClickCords().slice(0,-2); // dblClick, remove last click cords
+   var color = $mouse.getDrawingColor();
+   new Polygon(cords, color).draw($canvas);
+
+   $mouse.endDrawing();
 });
 
-canvas.addEventListener("click", event => {
+$("canvas").addEventListener("click", event =>
+{
+  if (!$mouse.isDrawing()) return; // go home, you are drunk
 
-  if ($mouse.isDrawing())
-  {
-    $mouse.addClickCords(event.clientX, event.clientY);
+  $mouse.addClickCords(event.clientX, event.clientY);
 
-    if ($mouse.isAllCords())  //drawing complete
-    {
-      var cords = $mouse.getClickCords();
+  if (!$mouse.isAllCords()) return; // else continue, drawing is complete
 
-      switch($mouse.isDrawing()) {
-        case 'Rectangle':
-          new Rectangle(cords).draw(); break;
-        case 'Triangle':
-          new Triangle(cords).draw(); break;
-        case 'Circle':
-          new Circle(cords).draw(); break;
-        case 'Polygon': // is handled in the dbclick event instead
-      }
-      $mouse.endDrawing();
-    }
+  var cords = $mouse.getClickCords();
+  var color = $mouse.getDrawingColor();
 
+  switch($mouse.isDrawing()) {
+    case 'Rectangle': new Rectangle(cords, color).draw($canvas); break;
+    case 'Triangle':  new Triangle(cords, color).draw($canvas); break;
+    case 'Circle':    new Circle(cords, color).draw($canvas); break;
+    case 'Polygon':   // is handled in the dbclick event
   }
+
+  $mouse.endDrawing();
 });
 
+// Escape to abort drawing
+document.addEventListener("keyup", event =>
+{
+  if (event.keyCode == 27) // escape
+    if ($mouse.isDrawing())
+        $mouse.endDrawing();
+});
 
-/////////////////
-setTimeout( () => { status.remove(); }, 1500);
-/////////////////
+/////////////////////////////////////////////////////////////
+setTimeout( () => { $status.remove(); }, 1000); // not triggered if errors :-)
+/////////////////////////////////////////////////////////////
 }; // end onLoad
