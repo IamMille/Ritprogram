@@ -61,3 +61,7 @@ Tanken har varit att göra minimal inverkan på denna filen.
 De ändringar som gjorts är på konstruktorerna. Istället för att ta emot flera parametrar med koordinater tar de nu emot en Array.
 
 Vidare finns det nu en ny metod för alla figurerna, draw(), som används till att rita upp objektet på canvas.
+
+DEMO
+==================
+[Klicka här för att se demo](https://iammille.github.io/Ritprogram/)
