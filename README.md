@@ -3,13 +3,13 @@
 Tillvägagångssätt
 ==================
 Tekniken som använts för denna uppgiften är HTML5 och senaste Javascript ECMAScript 6.
-Tanken är har varit att använda den senaste tekniken även om den inte fungerar i alla webbläsare. Anpassningen har därför blivit Chrome. då den har bra stöd för de senaste funktionerna i båda HTML och Javscript.
+Tanken är har varit att använda den senaste tekniken även om den inte fungerar i alla webbläsare. Anpassningen har därför blivit till Chrome. då den har bra stöd för de senaste funktionerna i båda HTML och Javscript.
 
 Koden är tänkt att vara lättläst och därför har jag valt att dela upp Javascriptet i olika filer där jag döljer den “omständiga” koden ifrån själva applikationen som man kan följ i, näst in till, läsning som då blir enklare att tolka, följa och förstå.
 
 Applikationen
 ====================
-Applikationen är tänkt att vara ett ritprogram för geometriska figurer (enligt uppgift i skolan):
+Applikationen ett väldigt enkelt ritprogram för geometriska figurer (enligt uppgift i skolan):
 “Uppgiften handlar om att använda DOM-manipulation, Events och prototyper, samt rita på Canvas.”
 
 Sidan består av ett stort canvas som täcker hela den synliga viewporten. Det finns en statusrad längst ner i sidfoten som hela tiden uppdateras beroende på vad man gör på sidan.
