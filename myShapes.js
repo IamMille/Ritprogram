@@ -129,7 +129,6 @@ Circle.prototype.draw = function($canvas)
 					 this.radius, 0, Math.PI*2 );
 	ctx.stroke();
 	$canvas.addDrawing(this);
-	console.log($canvas.getDrawings());
 };
 
 // ##############################  RECTANGLE ##############################

@@ -36,7 +36,6 @@ class Canvas {
   }
   addDrawing(obj) { // used by "figure".draw()
     this.drawings.push(obj);
-    console.log(this.drawings.length);
     this.setRandomColor();
   }
   getDrawings() {
@@ -79,7 +78,7 @@ class Canvas {
   setRandomColor() {
     var randomColor = [ "#7F00FF","#00FFFF","#FF00FF","#0000FF",
                         "#FFFF00","#FF0000","#00FF00","#FF7F00"];
-    $("input[type='color']").value = randomColor[this.drawings.length] || "#000";
+    $("input[type='color']").value = randomColor[this.drawings.length] || "#000000";
   }
   toggleMenu() {
     var isOpen = $("menu").classList.contains('slide-in');
