@@ -102,7 +102,7 @@ function Circle(args, color) //(x, y, radius)
 	//this.cords  = [x, y];
 	//this.radius = radius;
 	this.figure = "Circle";
-	this.color = color || "#000";
+	this.color = color;
 	this.cords = [ args[0], args[1] ];
 	this.radius = this.distancePoints(
 		{x: args[0], y: args[1]},
@@ -175,7 +175,7 @@ function Triangle(args, color)
 {
 	//this.cords  = [x1,y1, x2,y2, x3,y3];
 	this.figure = "Triangle";
-	this.color = color || "#000";
+	this.color = color;
 	this.cords  = args;
 }
 

@@ -59,15 +59,20 @@ $$("button, input[type='color']").forEach(btn =>  // buttons AND colorpicker
   btn.addEventListener("click", event =>
   {
     var btnName = btn.innerText;
-    if (btnName == "Export") $canvas.openExport();
-    else if (btnName == "Import") $canvas.openImport();
-    else if (btnName == "CLOSE") $canvas.closeExport(); // Export dialog
-    else if (btnName == "IMPORT") $canvas.closeImport();
-    else if (btnName == "New") $canvas.clear();
-    else if (btnName == "Menu") $canvas.toggleMenu();
-    else {
-      $mouse.startDrawing(btnName);
-      $mouse.addClickCords(); // empty, to just update status
+    switch (btnName) {
+      case "Export": $canvas.openExport(); break;
+      case "Import": $canvas.openImport(); break;
+      case "CLOSE": $canvas.closeExport(); break; // Export dialog
+      case "IMPORT": $canvas.closeImport(); break;
+      case "New": $canvas.clear(); break;
+      case "Menu": $canvas.toggleMenu(); break;
+
+      case "Triangle":
+      case "Rectangle":
+      case "Circle":
+      case "Polygon":
+        $mouse.startDrawing(btnName);
+        $mouse.addClickCords(); // empty, to just update status
     }
   });
 
